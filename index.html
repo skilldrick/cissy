@@ -1,10 +1,15 @@
 <!doctype HTML>
 <html>
   <head>
-    <title>?</title>
+    <title>Cissy</title>
     <style>
       body {
         font-family: monospace;
+      }
+
+      .loading {
+        display: block;
+        margin-bottom: 1em
       }
 
       .link {
@@ -14,6 +19,7 @@
     </style>
   </head>
   <body>
+    <span class="loading">Loading audio ...</span>
     <div class="container">
       <div>
         <input type=range min=0 max=1 value=0 data-channel=0 step=".05">
@@ -34,6 +40,7 @@
     </div>
 
     <a class="link" href="http://skilldrick.co.uk/video">Music video</a>
+    <a class="link" href="http://github.com/skilldrick/cissy">Github</a>
   </body>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>

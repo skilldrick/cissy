@@ -133,10 +133,12 @@
       playSamples(drumPattern, i, channels[3]);
     }
 
-    setInputValues();
+    doneLoading();
   });
 
-  function setInputValues() {
+  function doneLoading() {
+    $(".loading").hide();
+
     channels.forEach(function (channel, index) {
       $('input[data-channel=' + index + ']').val(channel.gain.value);
     });
