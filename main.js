@@ -115,7 +115,7 @@
     });
   }
 
-  getAudioSource(ctx, 'cissy-strut.mp3', function (source) {
+  getAudioSource(ctx, 'cissy-strut-start.mp3', function (source) {
     buffer = source.buffer;
 
     for (var i = 0; i < 4; i++) {
