@@ -115,7 +115,7 @@
     });
   }
 
-  getAudioSource(ctx, 'cissy-strut-start.mp3', function (source) {
+  function start(source) {
     buffer = source.buffer;
 
     for (var i = 0; i < 4; i++) {
@@ -133,16 +133,22 @@
       playSamples(drumPattern, i, channels[3]);
     }
 
-    doneLoading();
-  });
-
-  function doneLoading() {
-    $(".loading").hide();
-
     channels.forEach(function (channel, index) {
       $('input[data-channel=' + index + ']').val(channel.gain.value);
     });
   }
+
+  getAudioSource(ctx, 'cissy-strut-start.mp3', function (source) {
+    var $start = $('.start');
+    $start.show();
+
+    $start.click(function () {
+      start(source);
+      $start.hide();
+    });
+
+    $(".loading").hide();
+  });
 
   $('input').on("input", function () {
     var $el = $(this);

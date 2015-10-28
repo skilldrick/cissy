@@ -16,11 +16,21 @@
         display: block;
         margin-top: 1em;
       }
+
+      .start {
+        font-family: monospace;
+        font-size: 18px;
+        display: none;
+        padding: 5px;
+        margin-bottom: 10px;
+      }
     </style>
   </head>
   <body>
-    <span class="loading">Loading audio ...</span>
     <div class="container">
+      <span class="loading">Loading audio ...</span>
+      <button class="start">Start!</button>
+
       <div>
         <input type=range min=0 max=1 value=0 data-channel=0 step=".05">
         <label>Main loop</label>
@@ -37,10 +47,10 @@
         <input type=range min=0 max=1 value=0 data-channel=3 step=".05">
         <label>Snare</label>
       </div>
-    </div>
 
-    <a class="link" href="http://skilldrick.co.uk/video">Music video</a>
-    <a class="link" href="http://github.com/skilldrick/cissy">Github</a>
+      <a class="link" href="http://skilldrick.co.uk/video">Music video</a>
+      <a class="link" href="http://github.com/skilldrick/cissy">Github</a>
+    </div>
   </body>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
