@@ -150,7 +150,7 @@
     $(".loading").hide();
   });
 
-  $('input').on("input", function () {
+  $('.sliders input').on("input", function () {
     var $el = $(this);
     var channel = $el.data('channel');
     var value = $el.val();
