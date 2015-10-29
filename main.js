@@ -88,11 +88,15 @@
     ['drum', 30, 2]
   ];
 
-  function playBufferFrom(when, offset, length, output) {
+  function createSource(output) {
     var source = ctx.createBufferSource();
     source.buffer = buffer;
     source.connect(output);
-    source.start(when, offset, length);
+    return source;
+  }
+
+  function playBufferFrom(when, offset, length, output) {
+    createSource(output).start(when, offset, length);
   }
 
   // start is measured in quarter-beats from start of playing
