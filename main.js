@@ -2,7 +2,7 @@
   var ctx = new (window.AudioContext || window.webkitAudioContext)();
   var bpm = 90;
   var beatLength = 60 / bpm;
-  var quarterLength = beatLength / 4;
+  var quarterBeatLength = beatLength / 4;
   var buffer;
   var channels = [];
 
@@ -15,7 +15,7 @@
     drum: 38.45,
   };
 
-  // label name, beat number, length
+  // label name, quarter-beat number, length
   var fastPattern = [
     ['short1',  0,      1],
     ['short1',  2,      1],
@@ -95,17 +95,20 @@
     source.start(when, offset, length);
   }
 
+  // start is measured in quarter-beats from start of playing
+  // length is measured in quarter-beats
   function playSample(label, start, length, output) {
     playBufferFrom(
-      ctx.currentTime + start * quarterLength,
+      ctx.currentTime + start * quarterBeatLength,
       labels[label],
-      length * quarterLength,
+      length * quarterBeatLength,
       output
     );
   }
 
-  function playSamples(samples, patternNumber, output) {
-    samples.forEach(function (sample) {
+  // pattern is one of the four patterns above
+  function playPattern(pattern, patternNumber, output) {
+    pattern.forEach(function (sample) {
       playSample(
         sample[0],
         patternNumber * 32 + sample[1],
@@ -118,6 +121,8 @@
   function start(source) {
     buffer = source.buffer;
 
+    // Create four channels, each of which is a gain node connected to the
+    // destination node
     for (var i = 0; i < 4; i++) {
       channels[i] = ctx.createGain();
       channels[i].gain.value = 0;
@@ -126,11 +131,13 @@
 
     channels[0].gain.value = 0.5; // Start with first channel turned up only
 
+    // Queue up each of the four patterns to play on the four channels,
+    // 32 times.
     for (var i = 0; i < 32; i++) {
-      playSamples(slowPattern, i, channels[0]);
-      playSamples(fastPattern, i, channels[1]);
-      playSamples(cymbalPattern, i, channels[2]);
-      playSamples(drumPattern, i, channels[3]);
+      playPattern(slowPattern, i, channels[0]);
+      playPattern(fastPattern, i, channels[1]);
+      playPattern(cymbalPattern, i, channels[2]);
+      playPattern(drumPattern, i, channels[3]);
     }
 
     channels.forEach(function (channel, index) {
