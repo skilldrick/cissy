@@ -8,13 +8,11 @@ function getData(filename, cb) {
   request.send();
 }
 
-function getAudioSource(ctx, filename, cb) {
+function getAudioBuffer(ctx, filename, cb) {
   getData(filename, function (audioData) {
     ctx.decodeAudioData(audioData,
       function (buffer) {
-        var source = ctx.createBufferSource();
-        source.buffer = buffer;
-        cb(source);
+        cb(buffer);
       },
       function (e) {
         console.log("Error decoding audio data" + e.err);

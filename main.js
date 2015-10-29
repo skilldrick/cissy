@@ -118,9 +118,7 @@
     });
   }
 
-  function start(source) {
-    buffer = source.buffer;
-
+  function start() {
     // Create four channels, each of which is a gain node connected to the
     // destination node
     for (var i = 0; i < 4; i++) {
@@ -145,12 +143,14 @@
     });
   }
 
-  getAudioSource(ctx, 'cissy-strut-start.mp3', function (source) {
+  getAudioBuffer(ctx, 'cissy-strut-start.mp3', function (_buffer) {
+    buffer = _buffer; // Expose buffer in outer scope
+
     var $start = $('.start');
     $start.show();
 
     $start.click(function () {
-      start(source);
+      start();
       $start.hide();
     });
 
