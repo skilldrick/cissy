@@ -131,11 +131,11 @@ const start = (buffer) => {
   connect(drumPattern.sampler, channels[3]);
 
   const scheduler = new Scheduler(360, (note, when, length) => {
-    note.sampler.play(note.label, when, length(note.length));
+    note.sampler.play(note.label, when, length);
   });
 
   [fastPattern, slowPattern, cymbalPattern, drumPattern].forEach((pattern) => {
-    scheduler.addLoop(0, pattern.loopLength, pattern.notes);
+    scheduler.addLoop(pattern.loopLength, pattern.notes);
   });
 
   scheduler.start();
