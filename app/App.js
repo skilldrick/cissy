@@ -2,8 +2,8 @@ import { ctx } from 'sine/audio';
 import { connect } from 'sine/util';
 import { createGain } from 'sine/nodes';
 import getAudioBuffer from 'sine/ajax';
-import Sampler from 'sine/sampler';
-import clock from 'sine/clock';
+import { SingleBufferSampler } from 'sine/sampler';
+import Scheduler from 'sine/scheduler';
 
 const channels = [];
 
@@ -14,7 +14,7 @@ const fastPattern = {
     short1: 51.61,
     short2: 50.24
   },
-  samples: [
+  notes: [
     ['short1',  0,      1],
     ['short1',  2,      1],
     ['short1',  5,      1],
@@ -52,7 +52,7 @@ const slowPattern = {
   offsetMap: {
     main: 35.52
   },
-  samples: [
+  notes: [
     ['main', 0, 8]
   ]
 };
@@ -62,7 +62,7 @@ const cymbalPattern = {
   offsetMap: {
     cymbal: 42.73
   },
-  samples: [
+  notes: [
     ['cymbal', 0, 3]
   ]
 };
@@ -72,7 +72,7 @@ const drumPattern = {
   offsetMap: {
     drum: 38.45
   },
-  samples: [
+  notes: [
     ['drum',  0, 1],
     ['drum',  2, 1],
     ['drum',  4, 1],
@@ -95,22 +95,15 @@ const drumPattern = {
   ]
 };
 
-const partition = (samples) => {
-  const partitioned = [];
-  samples.forEach(sample => {
-    const partition = Math.floor(sample[1]);
-    if (!partitioned[partition]) {
-      partitioned[partition] = [];
-    }
-    partitioned[partition].push(sample);
+const process = (buffer, pattern) => {
+  const sampler = new SingleBufferSampler(buffer, pattern.offsetMap);
+  pattern.sampler = sampler;
+
+  // convert notes to format required by Scheduler
+  pattern.notes = pattern.notes.map(note => {
+    return { label: note[0], beatOffset: note[1], length: note[2], sampler: sampler };
   });
 
-  return partitioned;
-}
-
-const process = (buffer, pattern) => {
-  pattern.partitioned = partition(pattern.samples);
-  pattern.sampler = new Sampler(buffer, pattern.offsetMap);
   return pattern;
 };
 
@@ -127,7 +120,7 @@ const start = (buffer) => {
     $('input[data-channel=' + index + ']').val(channel.gain.value);
   });
 
-  // Add partitioned and sampler to each pattern
+  // Format each pattern as needed by Scheduler
   [fastPattern, slowPattern, cymbalPattern, drumPattern].forEach((pattern) => {
     process(buffer, pattern);
   });
@@ -137,27 +130,15 @@ const start = (buffer) => {
   connect(cymbalPattern.sampler, channels[2]);
   connect(drumPattern.sampler, channels[3]);
 
-  const playBeat = (pattern, beat, when, length) => {
-    const loopBeat = beat % pattern.loopLength;
-    const samples = pattern.partitioned[loopBeat] || [];
-
-    samples.forEach((sample) => {
-      pattern.sampler.play(sample[0], when(sample[1] - loopBeat), length(sample[2]));
-    });
-  };
-
-  clock.onBeat((beat, when, length) => {
-    playBeat(fastPattern, beat, when, length);
-    playBeat(slowPattern, beat, when, length);
-    playBeat(cymbalPattern, beat, when, length);
-    playBeat(drumPattern, beat, when, length);
+  const scheduler = new Scheduler(360, (note, when, length) => {
+    note.sampler.play(note.label, when, length(note.length));
   });
 
-  clock.setBpm(360);
+  [fastPattern, slowPattern, cymbalPattern, drumPattern].forEach((pattern) => {
+    scheduler.addLoop(0, pattern.loopLength, pattern.notes);
+  });
 
-  clock.start();
-
-  window.clock = clock;
+  scheduler.start();
 };
 
 getAudioBuffer('cissy-strut-start.mp3').then((buffer) => {
